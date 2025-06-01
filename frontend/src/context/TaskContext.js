@@ -35,19 +35,7 @@ export const TaskProvider = ({ children }) => {
     status: 'all'
   });
 
-  // Fetch tasks when authenticated
-  useEffect(() => {
-    if (isAuthenticated) {
-      fetchTasks();
-      fetchProjects();
-      fetchTags();
-    } else {
-      setTasks([]);
-      setProjects([]);
-      setTags([]);
-    }
-  }, [isAuthenticated, fetchTasks, fetchProjects, fetchTags]); // Added fetch functions to dep array
-
+  // Define fetch functions before useEffect that uses them
   const fetchTasks = useCallback(async () => {
     try {
       setLoading(true);
@@ -78,6 +66,19 @@ export const TaskProvider = ({ children }) => {
       console.error('Error al cargar las etiquetas', err);
     }
   }, []); // Empty dependency array
+
+  // Fetch tasks when authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchTasks();
+      fetchProjects();
+      fetchTags();
+    } else {
+      setTasks([]);
+      setProjects([]);
+      setTags([]);
+    }
+  }, [isAuthenticated, fetchTasks, fetchProjects, fetchTags]);
 
   const addTask = async (taskData) => {
     try {
