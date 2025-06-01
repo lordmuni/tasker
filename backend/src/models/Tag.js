@@ -4,7 +4,8 @@ const TagSchema = new mongoose.Schema({
   name: {
     type: String,
     required: [true, 'El nombre de la etiqueta es obligatorio'],
-    trim: true
+    trim: true,
+    maxlength: [50, 'El nombre de la etiqueta no puede exceder los 50 caracteres']
   },
   color: {
     type: String,

@@ -4,7 +4,8 @@ const ChecklistItemSchema = new mongoose.Schema({
   text: {
     type: String,
     required: true,
-    trim: true
+    trim: true,
+    maxlength: [200, 'El texto del item no puede exceder los 200 caracteres']
   },
   completed: {
     type: Boolean,
@@ -16,11 +17,13 @@ const TaskSchema = new mongoose.Schema({
   title: {
     type: String,
     required: [true, 'El título de la tarea es obligatorio'],
-    trim: true
+    trim: true,
+    maxlength: [255, 'El título de la tarea no puede exceder los 255 caracteres']
   },
   description: {
     type: String,
-    trim: true
+    trim: true,
+    maxlength: [1000, 'La descripción de la tarea no puede exceder los 1000 caracteres']
   },
   status: {
     type: String,

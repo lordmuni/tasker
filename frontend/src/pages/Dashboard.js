@@ -19,14 +19,6 @@ const Dashboard = () => {
 
   useEffect(() => {
     fetchTasks();
-    
-    // Hacer la función openTagModal accesible globalmente
-    window.openTagModal = openTagModal;
-    
-    // Limpiar cuando el componente se desmonte
-    return () => {
-      delete window.openTagModal;
-    };
   }, [fetchTasks]);
 
   const handleDragEnd = async (result) => {

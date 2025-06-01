@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect, useContext } from 'react';
+import React, { createContext, useState, useEffect, useContext, useCallback } from 'react';
 import axios from 'axios';
 import { AuthContext } from './AuthContext';
 
@@ -46,9 +46,9 @@ export const TaskProvider = ({ children }) => {
       setProjects([]);
       setTags([]);
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, fetchTasks, fetchProjects, fetchTags]); // Added fetch functions to dep array
 
-  const fetchTasks = async () => {
+  const fetchTasks = useCallback(async () => {
     try {
       setLoading(true);
       const response = await api.get('/tasks');
@@ -59,25 +59,25 @@ export const TaskProvider = ({ children }) => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []); // Empty dependency array as setters are stable
 
-  const fetchProjects = async () => {
+  const fetchProjects = useCallback(async () => {
     try {
       const response = await api.get('/projects');
       setProjects(response.data);
     } catch (err) {
       console.error('Error al cargar los proyectos', err);
     }
-  };
+  }, []); // Empty dependency array
 
-  const fetchTags = async () => {
+  const fetchTags = useCallback(async () => {
     try {
       const response = await api.get('/tags');
       setTags(response.data);
     } catch (err) {
       console.error('Error al cargar las etiquetas', err);
     }
-  };
+  }, []); // Empty dependency array
 
   const addTask = async (taskData) => {
     try {
@@ -190,15 +190,15 @@ export const TaskProvider = ({ children }) => {
         console.error('Datos del error:', err.response.data);
         console.error('Estado HTTP:', err.response.status);
         console.error('Cabeceras:', err.response.headers);
-        alert(`Error al crear el proyecto: ${err.response.data.message || 'Error en el servidor'}`);
+        setError(`Error al crear el proyecto: ${err.response.data.message || 'Error en el servidor'}`);
       } else if (err.request) {
         // La petición fue hecha pero no se recibió respuesta
         console.error('No se recibió respuesta del servidor');
-        alert('No se pudo conectar con el servidor. Verifica tu conexión a internet.');
+        setError('No se pudo conectar con el servidor. Verifica tu conexión a internet.');
       } else {
         // Algo sucedió al configurar la petición
         console.error('Error de configuración:', err.message);
-        alert(`Error al configurar la petición: ${err.message}`);
+        setError(`Error al configurar la petición: ${err.message}`);
       }
       
       return null;
@@ -302,10 +302,13 @@ export const TaskProvider = ({ children }) => {
       }
       
       // Status filter
-      if (activeFilters.status === 'pending' && task.completed) {
+      if (activeFilters.status === 'pending' && task.status !== 'pending') {
         return false;
       }
-      if (activeFilters.status === 'completed' && !task.completed) {
+      if (activeFilters.status === 'in-progress' && task.status !== 'in-progress') {
+        return false;
+      }
+      if (activeFilters.status === 'completed' && task.status !== 'completed') {
         return false;
       }
       
